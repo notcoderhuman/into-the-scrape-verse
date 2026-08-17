@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10141c" />
+    <title>ScrapeShield · Reliability Console</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="console-shell">
+      <header class="app-header">
+        <a class="brand" href="/" aria-label="ScrapeShield dashboard"><span class="brand-mark" aria-hidden="true">S</span><span><strong>ScrapeShield</strong><small>reliability console</small></span></a>
+        <div class="header-tools"><div class="collector-meta"><span class="live-dot" aria-hidden="true"></span><span>Collector</span><code id="collector-id">Loading…</code></div><button id="refresh-button" type="button"><span aria-hidden="true">↻</span> Refresh</button></div>
+      </header>
+      <section class="inspect-bar" aria-label="Live dashboard state"><span class="signal-dot" aria-hidden="true"></span><span>LIVE DASHBOARD RESPONSE</span><span class="inspect-separator">/</span><span id="checked-at">Connecting to the collector…</span></section>
+      <section id="health-panel" class="panel health-panel loading" aria-labelledby="health-heading">
+        <div class="health-primary"><p class="section-kicker">EXTRACTION HEALTH</p><div class="health-title-row"><span id="health-icon" class="health-icon" aria-hidden="true">•</span><h1 id="health-heading">Checking…</h1></div><p id="health-summary" class="health-summary">Fetching the latest collector result.</p><div class="score-line"><span>Health score</span><strong id="health-score">—<small>/100</small></strong></div><div class="score-track" role="progressbar" aria-label="Health score" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="score-fill"></span></div></div>
+        <div class="metric-grid" aria-label="Live extraction metrics"><article class="metric-card"><span>MONITORED FIELDS</span><strong>5</strong><small>required by this collector</small></article><article class="metric-card"><span>USABLE FIELDS</span><strong id="metric-usable">—</strong><small>from the latest response</small></article><article class="metric-card"><span>MISSING FIELDS</span><strong id="metric-missing">—</strong><small>reported by validation</small></article><article class="metric-card"><span>RECOVERIES OBSERVED</span><strong id="metric-recoveries">—</strong><small>recorded locally</small></article></div>
+      </section>
+      <section class="dashboard-grid upper-grid">
+        <section class="panel product-panel" aria-labelledby="product-heading"><div class="panel-heading"><div><p class="section-kicker">LATEST STRUCTURED OUTPUT</p><h2 id="product-heading">Product Data</h2></div><span class="source-chip">LIVE COLLECTOR</span></div><div class="product-layout"><div id="image-frame" class="image-frame image-unavailable"><img id="product-image" alt="" /><div class="image-fallback"><span aria-hidden="true">◫</span><span>Image unavailable</span></div></div><div class="product-copy"><h3 id="product-name">Waiting for product data…</h3><p id="product-price" class="price">—</p><p id="product-description" class="product-description">The latest structured result will appear here.</p><dl class="product-details"><div><dt>Rating</dt><dd id="product-rating">—</dd></div><div><dt>Source URL</dt><dd><a href="https://shopalto.xyz/product/aurora-wireless-headphones" target="_blank" rel="noreferrer">shopalto.xyz product page</a></dd></div></dl></div></div></section>
+        <section class="panel field-panel" aria-labelledby="field-heading"><div class="panel-heading"><div><p class="section-kicker">VALIDATION LAYER</p><h2 id="field-heading">Field Health</h2></div><span class="count-chip">5 monitored</span></div><ul id="field-list" class="field-list"></ul></section>
+      </section>
+      <section id="diagnosis-panel" class="panel diagnosis-panel" aria-labelledby="diagnosis-heading"><div class="panel-heading"><div><p class="section-kicker">SCRAPESHIELD DETECTION</p><h2 id="diagnosis-heading">Failure Diagnosis</h2></div><span id="diagnosis-status" class="status-pill">CHECKING</span></div><p id="diagnosis-message">Waiting for validation results.</p><ul id="missing-fields" class="diagnosis-list"></ul></section>
+      <section class="dashboard-grid lower-grid">
+        <section class="panel timeline-panel" aria-labelledby="timeline-heading"><div class="panel-heading"><div><p class="section-kicker">OBSERVABILITY WORKFLOW</p><h2 id="timeline-heading">Self-Healing Timeline</h2></div></div><p class="timeline-note">ScrapeShield detects and verifies. Bright Data repair steps are workflow context, not completed actions unless supplied by the backend.</p><ol id="timeline-list" class="timeline-list"></ol></section>
+        <section class="panel history-panel" aria-labelledby="history-heading"><div class="panel-heading"><div><p class="section-kicker">BACKEND EVENT LOG</p><h2 id="history-heading">Recovery History</h2></div></div><p id="history-empty" class="empty-state">No recovery events have been recorded by the backend.</p><ul id="history-list" class="history-list"></ul></section>
+      </section>
+      <footer>ScrapeShield monitors collector output. Bright Data Scraper Studio performs any collector repair outside this dashboard.</footer>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

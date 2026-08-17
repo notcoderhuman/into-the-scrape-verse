@@ -1,0 +1,30 @@
+{
+  "lastStatus": "healthy",
+  "lastMissingFields": [],
+  "events": [
+    {
+      "timestamp": "2026-08-17T10:31:05.736Z",
+      "previousStatus": "failed",
+      "currentStatus": "healthy",
+      "recoveredFields": [
+        "product_name",
+        "price",
+        "description",
+        "rating",
+        "primary_image_url"
+      ]
+    },
+    {
+      "timestamp": "2026-08-17T09:49:45.893Z",
+      "previousStatus": "failed",
+      "currentStatus": "healthy",
+      "recoveredFields": [
+        "product_name",
+        "price",
+        "description",
+        "rating",
+        "primary_image_url"
+      ]
+    }
+  ]
+}
