@@ -124,12 +124,28 @@ const commandArgs =
 }
 
 app.get('/api/dashboard', async (req, res) => {
+  const demoMode = req.query.demo;
   const history = await readHistory();
   const timestamp = new Date().toISOString();
 
   try {
-    const product = await runCollector();
-    const { status, missingFields } = validateProduct(product);
+    let product;
+
+if (demoMode === 'degraded') {
+  product = JSON.parse(
+    await fs.readFile(
+      path.join(__dirname, 'data', 'demo-product.json'),
+      'utf8'
+    )
+  );
+  product.price = null;
+} else if (demoMode === 'failed') {
+  throw new Error('Demo Mode: simulated collector failure.');
+} else {
+  product = await runCollector();
+}
+
+const { status, missingFields } = validateProduct(product);
     let recoveryEvent = null;
 
     // A recovery is observed when a previously unhealthy run becomes fully valid.

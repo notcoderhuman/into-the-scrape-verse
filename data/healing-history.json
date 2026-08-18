@@ -1,5 +1,16 @@
 {
   "lastStatus": "healthy",
   "lastMissingFields": [],
-  "events": []
+  "events": [
+    {
+      "timestamp": "2026-08-18T16:05:36.954Z",
+      "previousStatus": "degraded",
+      "currentStatus": "healthy",
+      "recoveredFields": [
+        "product_name",
+        "price",
+        "description"
+      ]
+    }
+  ]
 }

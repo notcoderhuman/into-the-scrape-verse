@@ -1,0 +1,11 @@
+{
+  "product_name": "Aurora Wireless Headphones",
+  "price": {
+    "value": 142.75,
+    "currency": "USD",
+    "symbol": "$"
+  },
+  "description": "Over-ear wireless headphones with 40 mm drivers, 32 hours of battery, and memory-foam cups.",
+  "rating": 4.6,
+  "primary_image_url": "https://loremflickr.com/800/800/headphones,audio?lock=0011&v=132"
+}
