@@ -1,4 +1,3 @@
-@'
 # ScrapeShield
 
 > Self-healing web intelligence
