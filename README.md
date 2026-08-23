@@ -24,29 +24,9 @@ ScrapeShield adds a reliability layer around an existing Bright Data collector. 
 
 ## Architecture
 
-```text
-Target Website
-      |
-      v
-Bright Data Scraper Studio (custom collector)
-      |
-      v
-Structured JSON
-      |
-      v
-ScrapeShield server.js
-      |
-      +-- Field validation (required fields + price value check)
-      |
-      +-- Health scoring (healthy / degraded / failed)
-      |
-      +-- Recovery history (real events only, persisted to disk)
-      |
-      v
-/api/dashboard
-      |
-      v
-Browser Dashboard (vanilla HTML/CSS/JS)
+ScrapeShield monitors and verifies the output of a Bright Data Scraper Studio collector.
+
+![ScrapeShield Architecture](docs/scrapeshield-architecture.png)
 ```
 
 The stack is deliberately small: an Express server (`server.js`), a static single-page dashboard (`public/`), and two JSON data files (`data/`). There is no build step and no frontend framework.
