@@ -14,7 +14,12 @@ const CONFIG = {
   productUrl: 'https://shopalto.xyz/product/aurora-wireless-headphones',
   requiredFields: ['product_name', 'price', 'description', 'rating', 'primary_image_url'],
   historyFile: path.join(__dirname, 'data', 'healing-history.json'),
+  demoProductFile: path.join(__dirname, 'data', 'demo-product.json'),
 };
+
+// Demo modes are computed from local fixture data only. They never run the collector,
+// never fabricate recovery events, and never read or write the real recovery history.
+const DEMO_MODES = new Set(['healthy', 'degraded', 'failed']);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -22,9 +27,37 @@ function isUsable(value) {
   return value !== null && value !== undefined && String(value).trim() !== '';
 }
 
+// A structured price (e.g. { value, currency, symbol }) is only usable when it
+// actually carries a concrete value. A { value: null } price must count as unusable.
+function isUsablePrice(price) {
+  if (price && typeof price === 'object' && !Array.isArray(price)) {
+    return isUsable(price.value);
+  }
+  return isUsable(price);
+}
+
+function isFieldUsable(field, value) {
+  return field === 'price' ? isUsablePrice(value) : isUsable(value);
+}
+
 function validateProduct(product) {
-  const missingFields = CONFIG.requiredFields.filter((field) => !isUsable(product?.[field]));
+  const missingFields = CONFIG.requiredFields.filter((field) => !isFieldUsable(field, product?.[field]));
   return { missingFields, status: missingFields.length === 0 ? 'healthy' : 'degraded' };
+}
+
+// A recovery is observed only when a previously unhealthy run becomes fully valid.
+// recoveredFields reflects exactly what was missing in that previous state, so a prior
+// failure (which carries no per-field detail) never claims specific fields were recovered.
+function detectRecovery(history, status, timestamp) {
+  if (status === 'healthy' && ['degraded', 'failed'].includes(history.lastStatus)) {
+    return {
+      timestamp,
+      previousStatus: history.lastStatus,
+      currentStatus: status,
+      recoveredFields: Array.isArray(history.lastMissingFields) ? history.lastMissingFields : [],
+    };
+  }
+  return null;
 }
 
 async function readHistory() {
@@ -124,40 +157,64 @@ const commandArgs =
 }
 
 app.get('/api/dashboard', async (req, res) => {
-  const demoMode = req.query.demo;
-  const history = await readHistory();
+  const demoMode = typeof req.query.demo === 'string' ? req.query.demo : null;
   const timestamp = new Date().toISOString();
 
-  try {
-    let product;
+  // ---- Demo mode: fixtures only. The real recovery history is read for display
+  // ---- but never modified, and no recovery events are fabricated. ----
+  if (demoMode && DEMO_MODES.has(demoMode)) {
+    const history = await readHistory();
+    try {
+      if (demoMode === 'failed') {
+        return res.json({
+          status: 'failed',
+          product: null,
+          missingFields: CONFIG.requiredFields,
+          recoveryEvent: null,
+          history: history.events,
+          collectorId: CONFIG.collectorId,
+          checkedAt: timestamp,
+          demo: demoMode,
+          error: 'Demo Mode: simulated collector failure.',
+        });
+      }
 
-if (demoMode === 'degraded') {
-  product = JSON.parse(
-    await fs.readFile(
-      path.join(__dirname, 'data', 'demo-product.json'),
-      'utf8'
-    )
-  );
-  product.price = null;
-} else if (demoMode === 'failed') {
-  throw new Error('Demo Mode: simulated collector failure.');
-} else {
-  product = await runCollector();
-}
-
-const { status, missingFields } = validateProduct(product);
-    let recoveryEvent = null;
-
-    // A recovery is observed when a previously unhealthy run becomes fully valid.
-    if (status === 'healthy' && ['degraded', 'failed'].includes(history.lastStatus)) {
-      recoveryEvent = {
-        timestamp,
-        previousStatus: history.lastStatus,
-        currentStatus: status,
-        recoveredFields: history.lastMissingFields,
-      };
-      history.events.unshift(recoveryEvent);
+      const product = JSON.parse(await fs.readFile(CONFIG.demoProductFile, 'utf8'));
+      if (demoMode === 'degraded') product.price = null;
+      const { status, missingFields } = validateProduct(product);
+      return res.json({
+        status,
+        product,
+        missingFields,
+        recoveryEvent: null,
+        history: history.events,
+        collectorId: CONFIG.collectorId,
+        checkedAt: timestamp,
+        demo: demoMode,
+      });
+    } catch (error) {
+      console.error('Demo dashboard run failed:', error.message);
+      return res.status(500).json({
+        status: 'failed',
+        product: null,
+        missingFields: CONFIG.requiredFields,
+        recoveryEvent: null,
+        history: history.events,
+        collectorId: CONFIG.collectorId,
+        checkedAt: timestamp,
+        demo: demoMode,
+        error: 'Demo fixture could not be loaded.',
+      });
     }
+  }
+
+  // ---- Live mode: real collector run with real recovery history. ----
+  const history = await readHistory();
+  try {
+    const product = await runCollector();
+    const { status, missingFields } = validateProduct(product);
+    const recoveryEvent = detectRecovery(history, status, timestamp);
+    if (recoveryEvent) history.events.unshift(recoveryEvent);
 
     history.lastStatus = status;
     history.lastMissingFields = missingFields;
@@ -177,7 +234,9 @@ const { status, missingFields } = validateProduct(product);
     const message = error.message || 'Bright Data CLI execution failed.';
     console.error('Dashboard run failed:', message);
     history.lastStatus = 'failed';
-    history.lastMissingFields = CONFIG.requiredFields;
+    // A failed run carries no per-field detail, so it must not later claim that specific
+    // fields were recovered. Record an empty missing-field list instead of every field.
+    history.lastMissingFields = [];
     await writeHistory(history).catch((historyError) => console.error('Could not save failed status:', historyError.message));
 
     return res.status(502).json({
@@ -193,6 +252,19 @@ const { status, missingFields } = validateProduct(product);
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`ScrapeShield is running at http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`ScrapeShield is running at http://localhost:${PORT}`);
+  });
+}
+
+// Exported for lightweight unit tests (see `npm test`). Importing this module does not
+// start the HTTP server thanks to the require.main guard above.
+module.exports = {
+  app,
+  isUsable,
+  isUsablePrice,
+  isFieldUsable,
+  validateProduct,
+  detectRecovery,
+};

@@ -4,7 +4,8 @@
   "private": true,
   "description": "A small web-data reliability dashboard for a Bright Data Scraper Studio collector.",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test"
   },
   "engines": {
     "node": ">=18"

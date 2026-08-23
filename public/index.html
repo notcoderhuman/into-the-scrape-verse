@@ -14,6 +14,16 @@
         <div class="header-tools"><div class="collector-meta"><span class="live-dot" aria-hidden="true"></span><span>Collector</span><code id="collector-id">Loading…</code></div><button id="refresh-button" type="button"><span aria-hidden="true">↻</span> Refresh</button></div>
       </header>
       <section class="inspect-bar" aria-label="Live dashboard state"><span class="signal-dot" aria-hidden="true"></span><span>LIVE DASHBOARD RESPONSE</span><span class="inspect-separator">/</span><span id="checked-at">Connecting to the collector…</span></section>
+      <section class="demo-bar" aria-label="Data source and demo mode controls">
+        <div class="demo-switch" role="group" aria-label="Select dashboard data source">
+          <span class="demo-switch-label">DATA SOURCE</span>
+          <button type="button" class="demo-btn" data-mode="live" aria-pressed="true">Live</button>
+          <button type="button" class="demo-btn" data-mode="healthy" aria-pressed="false">Healthy</button>
+          <button type="button" class="demo-btn" data-mode="degraded" aria-pressed="false">Degraded</button>
+          <button type="button" class="demo-btn" data-mode="failed" aria-pressed="false">Failed</button>
+        </div>
+        <p id="demo-indicator" class="demo-indicator" role="status" hidden><span class="demo-indicator-dot" aria-hidden="true"></span><span id="demo-indicator-text"></span></p>
+      </section>
       <section id="health-panel" class="panel health-panel loading" aria-labelledby="health-heading">
         <div class="health-primary"><p class="section-kicker">EXTRACTION HEALTH</p><div class="health-title-row"><span id="health-icon" class="health-icon" aria-hidden="true">•</span><h1 id="health-heading">Checking…</h1></div><p id="health-summary" class="health-summary">Fetching the latest collector result.</p><div class="score-line"><span>Health score</span><strong id="health-score">—<small>/100</small></strong></div><div class="score-track" role="progressbar" aria-label="Health score" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="score-fill"></span></div></div>
         <div class="metric-grid" aria-label="Live extraction metrics"><article class="metric-card"><span>MONITORED FIELDS</span><strong>5</strong><small>required by this collector</small></article><article class="metric-card"><span>USABLE FIELDS</span><strong id="metric-usable">—</strong><small>from the latest response</small></article><article class="metric-card"><span>MISSING FIELDS</span><strong id="metric-missing">—</strong><small>reported by validation</small></article><article class="metric-card"><span>RECOVERIES OBSERVED</span><strong id="metric-recoveries">—</strong><small>recorded locally</small></article></div>
