@@ -180,8 +180,8 @@ This project was developed with AI assistance. An AI coding assistant (Anthropic
 
 | Member | Contributions |
 | --- | --- |
-| _Your name_ | Bright Data collector setup, backend (`server.js`), field validation & recovery logic |
-| _Teammate_ | Dashboard UI (HTML/CSS/JS), demo modes, documentation |
+| _Ayush Vij_ | Bright Data collector setup, backend (`server.js`), field validation & recovery logic |
+| _Namandeep Singh Taunk_ | Dashboard UI (HTML/CSS/JS), demo modes, documentation |
 
 ## License
 
